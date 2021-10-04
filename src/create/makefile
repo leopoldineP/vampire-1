@@ -18,6 +18,7 @@ composition.o \
 cube.o \
 cylinder.o \
 data.o \
+defects.o \
 ellipse.o \
 ellipsoid.o \
 faceted.o \
