@@ -9,6 +9,7 @@
 
 // Vampire headers
 #include "create.hpp"
+#include "errors.hpp"
 
 // Internal create header
 #include "internal.hpp"
@@ -97,16 +98,17 @@ void defects (std::vector<cs::catom_t> & catom_array){
 //-----------------------------------------------------------------------------
 std::vector < seed_point_defects > generate_random_defect_seed_points(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int defect_amount){
 
-    //parameters
-    double min_distance = 0; //minimum distance required between defects - none by default / defects should not be touching ?
-    double max_distance = sizex+sizey+sizez; //maximum distance required between defects - none by default
-    
     //set space if defects are in a defined area - by default equal to system dimensions
-    const double sizex = cs::system_dimensions[0];
-	const double sizey = cs::system_dimensions[1];
-    const double sizez = cs::system_dimensions[2];
+    const double defectspace_x = cs::system_dimensions[0];
+	const double defectspace_y = cs::system_dimensions[1];
+    const double defectspace_z = cs::system_dimensions[2];
     //read in sizes from input file for defined space (area struct)
 
+    //parameters - move to user interface
+    double min_distance = 0; //minimum distance required between defects - none by default / defects should not be touching ?
+    double max_distance = defectspace_x + defectspace_y + defectspace_z; //maximum distance required between defects - none by default
+    int max_trial_positions = 1000;
+    
     //vector for defect positions
     std::vector< seed_point_defects > defects(0);
 
@@ -118,27 +120,37 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(std::vecto
 
         // generate random x,y,z trial point
 		seed_point_defects position;
-	    position.x = (create::internal::grnd()*1.4-0.2)*size_x;
-	    position.y = (create::internal::grnd()*1.4-0.2)*size_y;
-	    position.z = (create::internal::grnd()*1.4-0.2)*size_z;
+	    position.x = (create::internal::grnd()*1.4-0.2)*defectspace_x;
+	    position.y = (create::internal::grnd()*1.4-0.2)*defectspace_y;
+	    position.z = (create::internal::grnd()*1.4-0.2)*defectspace_z;
 
 		// flag to see if positions are too close to each other (and fullfill specified min/max restrictions)
-		bool defect_distance=false;
+		bool defect_distance=true;
 
 		// loop over all previous positions and check if position is valid within restrictions placed on the position relative to other positions
-		for(unsigned int g=0; g<defects.size(); g++){
+        int check_loop=0; //counter to stop program from being stuck in this loop
+		for (unsigned int g=0; g<defects.size(); g++){
 			double distance_x = position.x-defects[g].x;
 			double distance_y = position.y-defects[g].y;
             double distance_z = position.z-defects[g].z;
 			double distance_ij = sqrt(distance_x*distance_x + distance_y*distance_y + distance_z*distance_z);
 			if(distance_ij<min_distance || distance_ij>max_distance){ //replace with && if minimum AND maximum are chosen, rn either or
-				defect_distance = true;
-				break;
+				defect_distance = false;
+                i=i-1; //run the random seed generator again for this defect
+                check_loop=check_loop+1; //counting unsuccessful trial positions
+                break;
 			}
 		}
 
+        //stop  if maximum of unsuccessful trial positions has been reached 
+        if (check_loop>max_trial_positions){
+            // Print informative message to screen
+            zlog << zTs() << "Maximum amount of trial positions was reached for defect " << i+1 << "and simulation was ended" << std::endl;
+            err::vexit(); //end simulation
+        }
+
 		// save valid positions
-		if(defect_distance == false) defects.push_back(position);
+		if(defect_distance == true) defects.push_back(position);
     }
 
     return defects;
