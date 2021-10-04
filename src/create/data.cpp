@@ -35,6 +35,7 @@ namespace create{
          int dilute_seed = 465865253;  // random seed to control dilution of atoms
          int mixing_seed = 100181363;  // random seed to control intermixing of atoms
          int spin_init_seed = 123456;  // random seed to control ranomised spin directions
+         int defect_seed  = 768329174;  // random seed to control defect positions
 
          double faceted_particle_100_radius = 1.0; // 100 facet particle radius
          double faceted_particle_110_radius = 1.0; // 110 facet particle radius

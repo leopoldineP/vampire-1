@@ -12,7 +12,7 @@
 
 // Internal create header
 #include "internal.hpp"
-
+#include "vio.hpp"
 
 namespace create{
 
@@ -24,7 +24,7 @@ struct seed_point_defects{
     double x; //x-position
     double y; //y-position
     double z; //z-position
-}
+};
 
 //define structure to store area parameters for enclosed area in which defects can be found
 struct area{
@@ -32,7 +32,7 @@ struct area{
     double max_x; //end of defined area in x
     double min_y; //start of defined area in y
     double max_y; //end of defined area in y
-}
+};
 
 // Function forward declaration
 std::vector < seed_point_defects > generate_random_defect_seed_points(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int defect_amount);
@@ -82,8 +82,9 @@ void defects (std::vector<cs::catom_t> & catom_array){
 
      //}
 
+     return;
 
-// //end of defect shape function
+} //end of defect shape function
 
 
 //-----------------------------------------------------------------------------
@@ -95,13 +96,51 @@ void defects (std::vector<cs::catom_t> & catom_array){
 //
 //-----------------------------------------------------------------------------
 std::vector < seed_point_defects > generate_random_defect_seed_points(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int defect_amount){
+
+    //parameters
+    double min_distance = 0; //minimum distance required between defects - none by default / defects should not be touching ?
+    double max_distance = sizex+sizey+sizez; //maximum distance required between defects - none by default
     
-    //set space if defects are in a defined area
+    //set space if defects are in a defined area - by default equal to system dimensions
+    const double sizex = cs::system_dimensions[0];
+	const double sizey = cs::system_dimensions[1];
+    const double sizez = cs::system_dimensions[2];
+    //read in sizes from input file for defined space (area struct)
 
     //vector for defect positions
     std::vector< seed_point_defects > defects(0);
 
-    
+    // re-seed random number generator on each CPU 
+	create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::defect_seed));
+
+    //loop through defects to create random position for each
+    for (int i=0; i<defect_amount; i++){
+
+        // generate random x,y,z trial point
+		seed_point_defects position;
+	    position.x = (create::internal::grnd()*1.4-0.2)*size_x;
+	    position.y = (create::internal::grnd()*1.4-0.2)*size_y;
+	    position.z = (create::internal::grnd()*1.4-0.2)*size_z;
+
+		// flag to see if positions are too close to each other (and fullfill specified min/max restrictions)
+		bool defect_distance=false;
+
+		// loop over all previous positions and check if position is valid within restrictions placed on the position relative to other positions
+		for(unsigned int g=0; g<defects.size(); g++){
+			double distance_x = position.x-defects[g].x;
+			double distance_y = position.y-defects[g].y;
+            double distance_z = position.z-defects[g].z;
+			double distance_ij = sqrt(distance_x*distance_x + distance_y*distance_y + distance_z*distance_z);
+			if(distance_ij<min_distance || distance_ij>max_distance){ //replace with && if minimum AND maximum are chosen, rn either or
+				defect_distance = true;
+				break;
+			}
+		}
+
+		// save valid positions
+		if(defect_distance == false) defects.push_back(position);
+    }
+
     return defects;
 
 } //end of defects position function
