@@ -58,21 +58,33 @@ void defects (std::vector<cs::catom_t> & catom_array){
 
     //parameteres (- for user interface compatability mp::num_materials;)
     const int defect_amount = 5; //local constant for number of defects 
-    const int defect_vacancies = 10; //how many sites are missing per defect
 
 
     //decide which shape 
 
     //if (sphere=true){ 
-      //  for (){
+    for (int def=0;def<defect_amount;def++){
 
-       // Print informative message to screen
+        // Print informative message to screen
+        zlog << zTs() << "Creating spherical defects" << std::endl;
 
-            //delete points inside shape (extension: only delete a certain percentage of points at the edge)
-        //    catom_array[atom].include=false;
+        //set defects radius
+        double defect_radius_squared = 2.0;
 
-         
-        //}
+        //loop over all atoms to see what atoms are within sphere - is there a quicker way to do this? (neighbourlist of position?)
+        for (int atom=0;atom<catom_array.size();atom++){
+
+            //calculate distance of atom from the defect position
+            double distance_from_defect_sq= (catom_array[atom].x-defects[def].x)*(catom_array[atom].x-defects[def].x) + 
+                                            (catom_array[atom].y-defects[def].y)*(catom_array[atom].y-defects[def].y) + 
+                                            (catom_array[atom].z-defects[def].z)*(catom_array[atom].z-defects[def].z);
+
+            if (distance_from_defect_sq<=defect_radius_squared){
+                //delete points inside shape (extension: only delete a certain percentage of points at the edge)
+                catom_array[atom].include=false;
+            }
+        }
+    }
        
     //}
 
@@ -82,6 +94,8 @@ void defects (std::vector<cs::catom_t> & catom_array){
     
 
      //}
+
+     //save defect attributes to file ?
 
      return;
 
