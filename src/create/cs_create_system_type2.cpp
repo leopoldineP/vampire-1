@@ -130,6 +130,9 @@ int create_system_type(std::vector<cs::catom_t> & catom_array){
 	// call alloy function
 	create::internal::alloy(catom_array);
 
+	//call defects function
+	create::internal::defects(catom_array);
+
 	// call dilution function
 	dilute(catom_array);
 

@@ -36,7 +36,7 @@ struct area{
 };
 
 // Function forward declaration
-std::vector < seed_point_defects > generate_random_defect_seed_points(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int defect_amount);
+std::vector < seed_point_defects > generate_random_defect_seed_points(const int defect_amount);
 
 
 //-----------------------------------------------------------------------------
@@ -57,7 +57,10 @@ void defects (std::vector<cs::catom_t> & catom_array){
     zlog << zTs() << "Calculating defect properties of system" << std::endl;
 
     //parameteres (- for user interface compatability mp::num_materials;)
-    const int defect_amount = 5; //local constant for number of defects 
+    const int defect_amount = 2; //local constant for number of defects 
+
+    //call function to calculate positions of defects
+    std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
 
 
     //decide which shape 
@@ -72,12 +75,13 @@ void defects (std::vector<cs::catom_t> & catom_array){
         double defect_radius_squared = 2.0;
 
         //loop over all atoms to see what atoms are within sphere - is there a quicker way to do this? (neighbourlist of position?)
-        for (int atom=0;atom<catom_array.size();atom++){
+        int number_of_atoms = catom_array.size();
+        for (int atom=0;atom<number_of_atoms;atom++){
 
             //calculate distance of atom from the defect position
-            double distance_from_defect_sq= (catom_array[atom].x-defects[def].x)*(catom_array[atom].x-defects[def].x) + 
-                                            (catom_array[atom].y-defects[def].y)*(catom_array[atom].y-defects[def].y) + 
-                                            (catom_array[atom].z-defects[def].z)*(catom_array[atom].z-defects[def].z);
+            double distance_from_defect_sq= (catom_array[atom].x-defect_pos[def].x)*(catom_array[atom].x-defect_pos[def].x) + 
+                                            (catom_array[atom].y-defect_pos[def].y)*(catom_array[atom].y-defect_pos[def].y) + 
+                                            (catom_array[atom].z-defect_pos[def].z)*(catom_array[atom].z-defect_pos[def].z);
 
             if (distance_from_defect_sq<=defect_radius_squared){
                 //delete points inside shape (extension: only delete a certain percentage of points at the edge)
@@ -97,7 +101,9 @@ void defects (std::vector<cs::catom_t> & catom_array){
 
      //save defect attributes to file ?
 
-     return;
+     
+
+    return;
 
 } //end of defect shape function
 
@@ -110,7 +116,7 @@ void defects (std::vector<cs::catom_t> & catom_array){
 // (c)
 //
 //-----------------------------------------------------------------------------
-std::vector < seed_point_defects > generate_random_defect_seed_points(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int defect_amount){
+std::vector < seed_point_defects > generate_random_defect_seed_points(const int defect_amount){
 
     //set space if defects are in a defined area - by default equal to system dimensions
     const double defectspace_x = cs::system_dimensions[0];
@@ -124,7 +130,7 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(std::vecto
     int max_trial_positions = 1000;
     
     //vector for defect positions
-    std::vector< seed_point_defects > defects(0);
+    std::vector< seed_point_defects > defects_positions(0);
 
     // re-seed random number generator on each CPU 
 	create::internal::grnd.seed(vmpi::parallel_rng_seed(create::internal::defect_seed));
@@ -143,10 +149,10 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(std::vecto
 
 		// loop over all previous positions and check if position is valid within restrictions placed on the position relative to other positions
         int check_loop=0; //counter to stop program from being stuck in this loop
-		for (unsigned int g=0; g<defects.size(); g++){
-			double distance_x = position.x-defects[g].x;
-			double distance_y = position.y-defects[g].y;
-            double distance_z = position.z-defects[g].z;
+		for (unsigned int g=0; g<defects_positions.size(); g++){
+			double distance_x = position.x-defects_positions[g].x;
+			double distance_y = position.y-defects_positions[g].y;
+            double distance_z = position.z-defects_positions[g].z;
 			double distance_ij = sqrt(distance_x*distance_x + distance_y*distance_y + distance_z*distance_z);
 			if(distance_ij<min_distance || distance_ij>max_distance){ //replace with && if minimum AND maximum are chosen, rn either or
 				defect_distance = false;
@@ -164,10 +170,11 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(std::vecto
         }
 
 		// save valid positions
-		if(defect_distance == true) defects.push_back(position);
+		if(defect_distance == true) defects_positions.push_back(position);
+       
     }
 
-    return defects;
+    return defects_positions;
 
 } //end of defects position function
 

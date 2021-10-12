@@ -134,6 +134,7 @@ namespace create{
 
 
       extern void alloy(std::vector<cs::catom_t> & catom_array);
+      extern void defects(std::vector<cs::catom_t> & catom_array);
       extern void layers(std::vector<cs::catom_t> & catom_array);
       extern void roughness(std::vector<cs::catom_t> & catom_array);
       extern void bubble(std::vector<double>& particle_origin, std::vector<cs::catom_t> & catom_array, const int grain);
