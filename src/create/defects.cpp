@@ -37,6 +37,7 @@ struct area{
 
 // Function forward declaration
 std::vector < seed_point_defects > generate_random_defect_seed_points(const int defect_amount);
+void voronoi_defects(std::vector<cs::catom_t> & catom_array);
 
 
 //-----------------------------------------------------------------------------
@@ -57,47 +58,52 @@ void defects (std::vector<cs::catom_t> & catom_array){
     zlog << zTs() << "Calculating defect properties of system" << std::endl;
 
     //parameteres (- for user interface compatability mp::num_materials;)
-    const int defect_amount = 2; //local constant for number of defects 
+    const int defect_amount = 5; //local constant for number of defects 
 
-    //call function to calculate positions of defects
+    //call function to calculate positions of defects -has to be inside functions as not valid for voronoi
     std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
 
 
     //decide which shape 
 
-    //if (sphere=true){ 
-    for (int def=0;def<defect_amount;def++){
+    bool sphere = true; 
 
-        // Print informative message to screen
-        zlog << zTs() << "Creating spherical defects" << std::endl;
+    if (sphere==true){ 
+        for (int def=0;def<defect_amount;def++){
 
-        //set defects radius
-        double defect_radius_squared = 2.0;
+            // Print informative message to screen
+            zlog << zTs() << "Creating spherical defects" << std::endl;
 
-        //loop over all atoms to see what atoms are within sphere - is there a quicker way to do this? (neighbourlist of position?)
-        int number_of_atoms = catom_array.size();
-        for (int atom=0;atom<number_of_atoms;atom++){
+            //set defects radius
+            double defect_radius_squared = 2.0;
 
-            //calculate distance of atom from the defect position
-            double distance_from_defect_sq= (catom_array[atom].x-defect_pos[def].x)*(catom_array[atom].x-defect_pos[def].x) + 
-                                            (catom_array[atom].y-defect_pos[def].y)*(catom_array[atom].y-defect_pos[def].y) + 
-                                            (catom_array[atom].z-defect_pos[def].z)*(catom_array[atom].z-defect_pos[def].z);
+            //loop over all atoms to see what atoms are within sphere - is there a quicker way to do this? (neighbourlist of position?)
+            int number_of_atoms = catom_array.size();
+            for (int atom=0;atom<number_of_atoms;atom++){
 
-            if (distance_from_defect_sq<=defect_radius_squared){
-                //delete points inside shape (extension: only delete a certain percentage of points at the edge)
-                catom_array[atom].include=false;
+                //calculate distance of atom from the defect position
+                double distance_from_defect_sq= (catom_array[atom].x-defect_pos[def].x)*(catom_array[atom].x-defect_pos[def].x) + 
+                                                (catom_array[atom].y-defect_pos[def].y)*(catom_array[atom].y-defect_pos[def].y) + 
+                                                (catom_array[atom].z-defect_pos[def].z)*(catom_array[atom].z-defect_pos[def].z);
+
+                if (distance_from_defect_sq<=defect_radius_squared){
+                    //delete points inside shape (extension: only delete a certain percentage of points in the centre)
+                    catom_array[atom].include=false;
+                }
             }
         }
-    }
-       
-    //}
+    }//end of sphere
 
-     //else { //irregular shape (default version)
+     else { //irregular shape:voronoi (default version)
 
-      // Print informative message to screen
+         // Print informative message to screen
+         zlog << zTs() << "Creating voronoi defects" << std::endl;
+
+         //call voronoi function
+         voronoi_defects(catom_array,defect_amount);
     
 
-     //}
+     } //end of irregular voronoi defects
 
      //save defect attributes to file ?
 
@@ -123,6 +129,7 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(const int 
 	const double defectspace_y = cs::system_dimensions[1];
     const double defectspace_z = cs::system_dimensions[2];
     //read in sizes from input file for defined space (area struct)
+    
 
     //parameters - move to user interface
     double min_distance = 0; //minimum distance required between defects - none by default / defects should not be touching ?
@@ -177,6 +184,12 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(const int 
     return defects_positions;
 
 } //end of defects position function
+
+void voronoi_defects(std::vector<cs::catom_t> & catom_array, const int defect_amount){
+
+    
+
+} //end of voronoi function
 
 } // end of internal namespace
 } // end of create namespace
