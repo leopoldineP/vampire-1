@@ -37,7 +37,7 @@ struct area{
 
 // Function forward declaration
 std::vector < seed_point_defects > generate_random_defect_seed_points(const int defect_amount);
-void voronoi_defects(std::vector<cs::catom_t> & catom_array);
+void voronoi_defects(std::vector<cs::catom_t> & catom_array, const int defect_amount);
 
 
 //-----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void defects (std::vector<cs::catom_t> & catom_array){
     zlog << zTs() << "Calculating defect properties of system" << std::endl;
 
     //parameteres (- for user interface compatability mp::num_materials;)
-    const int defect_amount = 5; //local constant for number of defects 
+    const int defect_amount = 3; //local constant for number of defects 
 
     //call function to calculate positions of defects -has to be inside functions as not valid for voronoi
     std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
@@ -66,16 +66,20 @@ void defects (std::vector<cs::catom_t> & catom_array){
 
     //decide which shape 
 
-    bool sphere = true; 
+    bool sphere = true; //hardcoded as true for now, change to a different version in interface 
+    bool triangle = false;
 
     if (sphere==true){ 
-        for (int def=0;def<defect_amount;def++){
+        // Print informative message to screen
+        zlog << zTs() << "Creating spherical defects" << std::endl;
 
-            // Print informative message to screen
-            zlog << zTs() << "Creating spherical defects" << std::endl;
+        for (int def=0;def<defect_amount;def++){ //loop through defects
 
             //set defects radius
-            double defect_radius_squared = 2.0;
+            double defect_radius_squared = 100.0;
+            
+            zlog << zTs() << "d" << defect_pos[def].x << " " << defect_pos[def].y << " " << defect_pos[def].z << std::endl;
+
 
             //loop over all atoms to see what atoms are within sphere - is there a quicker way to do this? (neighbourlist of position?)
             int number_of_atoms = catom_array.size();
@@ -87,14 +91,44 @@ void defects (std::vector<cs::catom_t> & catom_array){
                                                 (catom_array[atom].z-defect_pos[def].z)*(catom_array[atom].z-defect_pos[def].z);
 
                 if (distance_from_defect_sq<=defect_radius_squared){
-                    //delete points inside shape (extension: only delete a certain percentage of points in the centre)
-                    catom_array[atom].include=false;
+                    //make atoms inside shape nonmagnetic (extension: only delete a certain percentage of atoms in the centre)
+                    catom_array[atom].include=false; 
+                    //mp::material[catom_array[atom].material].non_magnetic = 1;
+                    zlog << zTs() << "d" << atom << std::endl;
                 }
             }
         }
     }//end of sphere
 
-     else { //irregular shape:voronoi (default version)
+    else if (triangle==true){ //needs new algorithm
+        for (int def=0;def<defect_amount;def++){
+
+            // Print informative message to screen
+            zlog << zTs() << "Creating triangular prism defects" << std::endl;
+
+            //set defects size
+            double deftriangle_height = 2.0; //hard coded but take from interface in the future
+            double deftriangle_base = 2.0; //change
+            double deftriangle_area =(deftriangle_height*deftriangle_base)/2.0; 
+            bool insidetriangle = false; //use barycentric coordinates instead
+       
+            //loop over all atoms to see what atoms are within triangular prism - is there a quicker way to do this? (neighbourlist of position?)
+            int number_of_atoms = catom_array.size();
+            for (int atom=0;atom<number_of_atoms;atom++){
+
+                //calculate corners of triangle
+                
+
+                if (insidetriangle == true){
+                    //make atoms inside shape nonmagnetic (extension: only delete a certain percentage of atoms in the centre)
+                    // delete: catom_array[atom].include=false;
+                    mp::material[catom_array[atom].material].non_magnetic = 1;
+                }
+            }
+        }
+    }//end of triangle
+
+    else { //irregular shape:voronoi (default version)
 
          // Print informative message to screen
          zlog << zTs() << "Creating voronoi defects" << std::endl;
@@ -145,7 +179,7 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(const int 
     //loop through defects to create random position for each
     for (int i=0; i<defect_amount; i++){
 
-        // generate random x,y,z trial point
+        // generate random x,y,z trial point 
 		seed_point_defects position;
 	    position.x = (create::internal::grnd()*1.4-0.2)*defectspace_x;
 	    position.y = (create::internal::grnd()*1.4-0.2)*defectspace_y;
