@@ -54,6 +54,14 @@ namespace create{
          bool grain_poission = false;
          
          bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
+         
+         //defects object
+         bool defect_bool = false;  //if set to true, defect functions run
+         int defect_amount = 1;  //amount of defects to be generated within the system
+         double min_defect_distance = 0; //minimum distance between defects
+         
+
+         
 
       } // end of internal namespace
 

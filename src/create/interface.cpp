@@ -531,6 +531,32 @@ namespace create{
          create::internal::spin_init_seed = sirs;
          return true;
       }
+      //--------------------------------------------------------------------
+      //defects
+      //--------------------------------------------------------------------
+      test="defects";
+      if(word == test){
+         create::internal::defect_bool = true;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="defect-amount";
+      if(word==test){
+         int da=atoi(value.c_str());
+         vin::check_for_valid_int(da, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::defect_amount = da;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="min-defect-distance";
+      if(word==test){
+         double mdd = atof(value.c_str());
+         vin::check_for_valid_value(mdd, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::min_defect_distance = mdd;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){
          std::vector<double> u(3);

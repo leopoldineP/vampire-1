@@ -112,6 +112,7 @@ namespace create{
       extern double faceted_particle_110_radius; // 110 facet radius
       extern double faceted_particle_111_radius; // 111 facet radius
       extern double cone_angle; // angle of cone to truncate cylinder
+      
 
       extern double voronoi_grain_size;
       extern double voronoi_grain_spacing;
@@ -126,6 +127,10 @@ namespace create{
       extern bool grain_poission;
 
       extern bool select_material_by_z_height;
+
+      extern bool defect_bool;
+      extern int defect_amount;
+      extern double min_defect_distance;
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module

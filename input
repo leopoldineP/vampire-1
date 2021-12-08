@@ -1,16 +1,24 @@
 #------------------------------------------
-# Sample vampire input file to perform
-# benchmark calculation for v4.0
+# Sample vampire input file to test
+# defect program
 #
 #------------------------------------------
 
 #------------------------------------------
 # Creation attributes:
 #------------------------------------------
+#create:voronoi-film
+#create:voronoi-size-variance = 0.1
+#create:particle-size = 1.0 !nm
+create:defects
+create:defect-amount = 100
+#create:min-distance = 1.0
+
 dimensions:unit-cell-size = 3.54 !A
-dimensions:system-size-x = 7.7 !nm
-dimensions:system-size-y = 7.7 !nm
-dimensions:system-size-z = 7.7 !nm
+dimensions:system-size-x = 50.0 !nm
+dimensions:system-size-y = 17.7 !nm
+dimensions:system-size-z = 1.0 !nm
+dimensions:particle-size = 2.0 !nm
 
 #------------------------------------------
 # Material Files:
@@ -36,6 +44,8 @@ sim:integrator = llg-heun
 #------------------------------------------
 output:real-time
 output:magnetisation
-
+config:atoms
+config:atoms-output-rate = 1
+config:output-nodes = 4
 screen:time-steps
 screen:magnetisation-length

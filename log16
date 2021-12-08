@@ -1,0 +1,33 @@
+22-10-2021 [10:55:08] Logfile opened
+22-10-2021 [10:55:08] Executable : vampire-serial
+22-10-2021 [10:55:08] Host name  : S44-69WVML7H:
+22-10-2021 [10:55:08] Directory  : /Users/s2266140/PhD/vampire-1
+22-10-2021 [10:55:08] Process ID : 45182
+22-10-2021 [10:55:08] Version    : 6.0.0
+22-10-2021 [10:55:08] Githash    : 751cd8c583b53da8572b1f4003ac8a2b8718c60e
+22-10-2021 [10:55:08] Opening main input file "input".
+22-10-2021 [10:55:08] Parsing system parameters from main input file.
+22-10-2021 [10:55:08] Opening material file "Co.mat".
+22-10-2021 [10:55:08] Parsing material file for parameters.
+22-10-2021 [10:55:08] Generating neighbour interactions for a lattice of 5 x 5 x 5 unit cells for neighbour calculation
+22-10-2021 [10:55:08] Calculating alloy properties of system
+22-10-2021 [10:55:08] Calculating defect properties of system
+22-10-2021 [10:55:08] Creating spherical defects
+22-10-2021 [10:55:08] d107.986 12.4885 13.4042
+22-10-2021 [10:55:08] d10830
+22-10-2021 [10:55:08] d10831
+22-10-2021 [10:55:08] d10910
+22-10-2021 [10:55:08] d10911
+22-10-2021 [10:55:08] d14350
+22-10-2021 [10:55:08] d14351
+22-10-2021 [10:55:08] d14430
+22-10-2021 [10:55:08] d14431
+22-10-2021 [10:55:08] d118.156 128.025 -2.60887
+22-10-2021 [10:55:08] d2913
+22-10-2021 [10:55:08] d2914
+22-10-2021 [10:55:08] d295.596 39.7834 21.0399
+22-10-2021 [10:55:08] Creating voronoi defects
+22-10-2021 [10:55:08] Removed 42240 non-magnetic atoms from system
+22-10-2021 [10:55:08] Determining atomic composition:
+22-10-2021 [10:55:08] Material 1 Co makes up nan % of all atoms ( 0 atoms )
+22-10-2021 [10:55:08] Fatal error: Aborting program.
