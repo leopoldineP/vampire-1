@@ -56,9 +56,17 @@ namespace create{
          bool select_material_by_z_height = false;	// Toggle overwriting of material id by z-height
          
          //defects object
-         bool defect_bool = false;  //if set to true, defect functions run
-         int defect_amount = 1;  //amount of defects to be generated within the system
-         double min_defect_distance = 0; //minimum distance between defects
+         bool defect_bool = false;           //if set to true, defect functions run
+         int defect_amount = 1;              //amount of defects to be generated within the system
+         int defect_vacancies = 5;           //amount of vacancies per defect
+         double min_defect_distance = 0;     //minimum distance between defects
+         //space in which defects can be found - by default equal to system dimensions
+         double defectspace_min_x = 0;
+         double defectspace_max_x = cs::system_dimensions[0];
+         double defectspace_min_y = 0;
+         double defectspace_max_y = cs::system_dimensions[1];
+         double defectspace_min_z = 0;
+         double defectspace_max_z = cs::system_dimensions[2];
          
 
          

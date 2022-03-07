@@ -548,6 +548,14 @@ namespace create{
          return true;
       }
       //--------------------------------------------------------------------
+      test="defect-vacancies";
+      if(word==test){
+         int dv=atoi(value.c_str());
+         vin::check_for_valid_int(dv, word, line, prefix, 0, 2000000000,"input","0 - 2,000,000,000");
+         create::internal::defect_vacancies = dv;
+         return true;
+      }
+      //--------------------------------------------------------------------
       test="min-defect-distance";
       if(word==test){
          double mdd = atof(value.c_str());
@@ -556,6 +564,54 @@ namespace create{
          return true;
       }
       //--------------------------------------------------------------------
+      test="defectspace-min-x";
+      if(word==test){
+         double dsmx = atof(value.c_str());
+         vin::check_for_valid_value(dsmx, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_min_x = dsmx;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="defectspace-max-x";
+      if(word==test){
+         double dsmax = atof(value.c_str());
+         vin::check_for_valid_value(dsmax, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_max_x = dsmax;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="defectspace-min-y";
+      if(word==test){
+         double dsmy = atof(value.c_str());
+         vin::check_for_valid_value(dsmy, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_min_y = dsmy;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="defectspace-max-y";
+      if(word==test){
+         double dsmay = atof(value.c_str());
+         vin::check_for_valid_value(dsmay, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_max_y = dsmay;
+         return true;
+      }//--------------------------------------------------------------------
+      test="defectspace-min-z";
+      if(word==test){
+         double dsmz = atof(value.c_str());
+         vin::check_for_valid_value(dsmz, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_min_z = dsmz;
+         return true;
+      }
+      //--------------------------------------------------------------------
+      test="defectspace-max-z";
+      if(word==test){
+         double dsmaz = atof(value.c_str());
+         vin::check_for_valid_value(dsmaz, word, line, prefix, unit, "none", 0.0, 1000000.0 ,"input","0.0 - 1000000.0");
+         create::internal::defectspace_max_z = dsmaz;
+         return true;
+      }
+      //--------------------------------------------------------------------
+
       
       /*std::string test="slonczewski-spin-polarization-unit-vector";
       if(word==test){

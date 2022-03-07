@@ -1,0 +1,69 @@
+01-01-2022 [13:48:12] Logfile opened
+01-01-2022 [13:48:12] Executable : vampire-serial
+01-01-2022 [13:48:12] Host name  : S44-69WVML7H:
+01-01-2022 [13:48:12] Directory  : /Users/s2266140/PhD/vampire-1
+01-01-2022 [13:48:12] Process ID : 56323
+01-01-2022 [13:48:12] Version    : 6.0.0
+01-01-2022 [13:48:12] Githash    : 4e3b85c1d8f492075a7bba61252557849db2a8c1
+01-01-2022 [13:48:12] Opening main input file "input".
+01-01-2022 [13:48:12] Parsing system parameters from main input file.
+01-01-2022 [13:48:12] Opening material file "Co.mat".
+01-01-2022 [13:48:12] Parsing material file for parameters.
+01-01-2022 [13:48:12] Warning: Number of parallel output nodes set to 4 which is greater than the number of processors (1) used in this simulation. Setting output-nodes to 1.
+01-01-2022 [13:48:12] Generating neighbour interactions for a lattice of 5 x 5 x 5 unit cells for neighbour calculation
+01-01-2022 [13:48:12] Calculating alloy properties of system
+01-01-2022 [13:48:12] Calculating defect properties of system
+01-01-2022 [13:48:12] Creating voronoi defects
+01-01-2022 [13:48:12] defectseed 1875
+01-01-2022 [13:48:12] defectseed 854
+01-01-2022 [13:48:12] defectseed 1282
+01-01-2022 [13:48:12] defectseed 1842
+01-01-2022 [13:48:12] Maximum amount of atoms in voronoi cell was reached at 4 for defect 3
+01-01-2022 [13:48:12] defectseed 1830
+01-01-2022 [13:48:12] defectseed 811
+01-01-2022 [13:48:12] defectseed 1789
+01-01-2022 [13:48:12] Maximum amount of atoms in voronoi cell was reached at 4 for defect 6
+01-01-2022 [13:48:12] defectseed 1805
+01-01-2022 [13:48:12] defectseed 688
+01-01-2022 [13:48:12] defectseed 821
+01-01-2022 [13:48:12] Maximum amount of atoms in voronoi cell was reached at 4 for defect 9
+01-01-2022 [13:48:12] Removed 0 non-magnetic atoms from system
+01-01-2022 [13:48:12] Determining atomic composition:
+01-01-2022 [13:48:12] Material 1 Co makes up 100 % of all atoms ( 15076 atoms )
+01-01-2022 [13:48:12] Memory required for neighbourlist calculation:0.120984 MB
+01-01-2022 [13:48:12] Allocating memory for supercell array in neighbourlist calculation
+01-01-2022 [13:48:12] 	Allocating memory done
+01-01-2022 [13:48:12] Populating supercell array for neighbourlist calculation...
+01-01-2022 [13:48:12] 	Populating supercell array completed
+01-01-2022 [13:48:12] Memory required for neighbour list:0.725904 MB
+01-01-2022 [13:48:12] Generating neighbour list...
+01-01-2022 [13:48:12] 	Neighbour list calculation complete
+01-01-2022 [13:48:12] Deallocating supercell array for neighbour list calculation
+01-01-2022 [13:48:12] 	Supercell array deallocated
+01-01-2022 [13:48:12] Copying system data to optimised data structures.
+01-01-2022 [13:48:12] Number of atoms generated on rank 0: 15076
+01-01-2022 [13:48:12] Memory required for copying to performance array on rank 0: 2.29155 MB RAM
+01-01-2022 [13:48:12] Identifying surface atoms using global threshold value of 6
+01-01-2022 [13:48:12] 10390 surface atoms found.
+01-01-2022 [13:48:12] Memory required for creation of 1D neighbour list on rank 0: 0.241216 MB RAM
+01-01-2022 [13:48:12] Initialising data structures for exchange calculation.
+01-01-2022 [13:48:12] Unrolled exchange template requires 0.634912MB RAM
+01-01-2022 [13:48:12] Number of atoms generated: 15076
+01-01-2022 [13:48:12] Initializing vampire modules
+01-01-2022 [13:48:12] Macrocell size = 10,10,10 Angstroms
+01-01-2022 [13:48:12] Macrocells in x,y,z: 26	26	2
+01-01-2022 [13:48:12] Total number of macrocells: 1352
+01-01-2022 [13:48:12] Memory required for macrocell arrays: 0.10816 MB
+01-01-2022 [13:48:12] Number of local macrocells on rank 0: 625
+01-01-2022 [13:48:12] Initialising data structures for anisotropy calculation for 100 materials
+01-01-2022 [13:48:12] Initialising statistics module
+01-01-2022 [13:48:12] Starting Simulation with Program Benchmark...
+01-01-2022 [13:48:14] Initialising configuration output... done!
+01-01-2022 [13:48:14] Total coordinate data filesize: 0.723648 MB
+01-01-2022 [13:48:14] Total spin data filesize (per snapshot): 0.361824 MB
+01-01-2022 [13:48:14] Outputting atomic coordinate file to disk 0.0419298 GB/s in 0.0172585 s
+01-01-2022 [13:48:14] Outputting configuration file 00000000 to disk 0.0279384 GB/s in 0.0129508 s [ 0.0529678 s]
+01-01-2022 [13:48:15] Outputting configuration file 00000001 to disk 0.0166643 GB/s in 0.0217125 s [ 0.0630433 s]
+01-01-2022 [13:48:17] Outputting configuration file 00000002 to disk 0.0268466 GB/s in 0.0134775 s [ 0.0457557 s]
+01-01-2022 [13:48:18] Outputting configuration file 00000003 to disk 0.0270023 GB/s in 0.0133997 s [ 0.0442073 s]
+01-01-2022 [13:48:19] Outputting configuration file 00000004 to disk 0.0275709 GB/s in 0.0131234 s [ 0.0410103 s]

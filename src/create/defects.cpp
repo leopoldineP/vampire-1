@@ -6,6 +6,7 @@
 
 // C++ standard library headers
 #include <fstream>
+#include <algorithm>
 
 // Vampire headers
 #include "create.hpp"
@@ -31,23 +32,13 @@ struct seed_point_defects{
 //define structure for distribution checks
 struct defect_distribution{
     bool x = false;
-    bool y = true;
-    bool z = true;
-};
-
-//define structure to store area parameters for enclosed area in which defects can be found
-struct area{
-    double min_x; //start of defined area in x
-    double max_x; //end of defined area in x
-    double min_y; //start of defined area in y
-    double max_y; //end of defined area in y
-    double min_z; //start of defined area in z
-    double max_z; //end of defined area in z
+    bool y = false;
+    bool z = false;
 };
 
 // Function forward declaration
 std::vector < seed_point_defects > generate_random_defect_seed_points(int defect_amount);
-void voronoi_defects(std::vector<cs::catom_t> & catom_array, int defect_amount);
+void voronoi_defects(std::vector<cs::catom_t> & catom_array);
 
 
 //-----------------------------------------------------------------------------
@@ -64,21 +55,19 @@ void defects (std::vector<cs::catom_t> & catom_array){
 	// return here if unused to avoid segmentation fault
 	//if(create::internal::mp.size() == 0) return; -copied from alloy, need to change?
 
-    // Print informative message to screen
+    // Print informative message to logfile
     zlog << zTs() << "Calculating defect properties of system" << std::endl;
-
-    //call function to calculate positions of defects -has to be inside function as not valid for voronoi
-    std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
 
 
     //decide which shape 
-
-    bool sphere = true; //hardcoded as true for now, change to a different version in interface 
+    bool sphere = false; //hardcoded as true for now, change to a different version in interface 
     bool triangle = false;
-
     if (sphere==true){ 
         // Print informative message to screen
         zlog << zTs() << "Creating spherical defects" << std::endl;
+
+        //call function to calculate positions of defects 
+        std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
 
         for (int def=0;def<create::internal::defect_amount;def++){ //loop through defects
 
@@ -102,7 +91,7 @@ void defects (std::vector<cs::catom_t> & catom_array){
                     //make atoms inside shape nonmagnetic (extension: only delete a certain percentage of atoms in the centre)
                     catom_array[atom].include=false; //delete
                     //mp::material[catom_array[atom].material].non_magnetic = 1; //make non-magnetic
-                    zlog << zTs() << "d" << atom << std::endl;
+                    zlog << zTs() << "delete" << atom << std::endl;
                 }
             }
         }
@@ -113,6 +102,9 @@ void defects (std::vector<cs::catom_t> & catom_array){
 
             // Print informative message to screen
             zlog << zTs() << "Creating triangular prism defects" << std::endl;
+
+            //call function to calculate positions of defects 
+            std::vector < seed_point_defects > defect_pos = generate_random_defect_seed_points(defect_amount);
 
             //set defects size
             double deftriangle_height = 2.0; //hard coded but take from interface in the future
@@ -142,9 +134,8 @@ void defects (std::vector<cs::catom_t> & catom_array){
          zlog << zTs() << "Creating voronoi defects" << std::endl;
 
          //call voronoi function
-         voronoi_defects(catom_array,defect_amount);
+         voronoi_defects(catom_array);
     
-
      } //end of irregular voronoi defects
 
      //save defect attributes to file ?
@@ -166,19 +157,14 @@ void defects (std::vector<cs::catom_t> & catom_array){
 //-----------------------------------------------------------------------------
 std::vector < seed_point_defects > generate_random_defect_seed_points(int defect_amount){
 
-    //read in sizes from input file for defined space - by default equal to system dimensions
-    area defined_space;
-    defined_space.min_x = 0;
-    defined_space.max_x = cs::system_dimensions[0];
-    defined_space.min_y = 0;
-    defined_space.max_y = cs::system_dimensions[1];
-    defined_space.min_z = 0;
-    defined_space.max_z = cs::system_dimensions[2];
+    //open file for distribution testing
+    std::ofstream distributionfile;
+    distributionfile.open ("distribution.txt");
 
     //set space for random number generator
-    const double defectspace_x = abs(defined_space.max_x)-abs(defined_space.min_x);
-	const double defectspace_y = abs(defined_space.max_y)-abs(defined_space.min_y);
-    const double defectspace_z = abs(defined_space.max_z)-abs(defined_space.min_z);
+    const double defectspace_x = abs(defectspace_max_x)-abs(defectspace_min_x);
+	const double defectspace_y = abs(defectspace_max_y)-abs(defectspace_min_y);
+    const double defectspace_z = abs(defectspace_max_z)-abs(defectspace_min_z);
 
     //set distribution of random points
     defect_distribution reversed;
@@ -186,7 +172,6 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(int defect
     //defect_distribution uniform; - default setting
     
     //parameters - move to user interface
-    //minimum distance required between defects - none by default / defects should not be touching ?
     double max_distance = defectspace_x + defectspace_y + defectspace_z; //maximum distance required between defects - none by default
     int max_trial_positions = 1000;
     
@@ -203,53 +188,53 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(int defect
 		seed_point_defects position;
         //x-coordinate
         if (gaussian.x==true){
-            position.x = (mtrandom::gaussian())*defectspace_x+defined_space.min_x;
+            position.x = (mtrandom::gaussian())*defectspace_x+defectspace_min_x;
         }
 	    else{ //uniform
-            position.x = (create::internal::grnd()*1.4-0.2)*defectspace_x+defined_space.min_x;
+            position.x = (create::internal::grnd())*defectspace_x+defectspace_min_x;
         }
         //y-coordinate
         if (gaussian.y==true){
-            position.y = (mtrandom::gaussian())*defectspace_y+defined_space.min_y;
+            position.y = (mtrandom::gaussian())*defectspace_y+defectspace_min_y;
         }
 	    else{ //uniform
-            position.y = (create::internal::grnd()*1.4-0.2)*defectspace_y+defined_space.min_y;
+            position.y = (create::internal::grnd())*defectspace_y+defectspace_min_y;
         }
         //z-coordinate
         if (gaussian.z==true){
-            position.z = (mtrandom::gaussian())*defectspace_z+defined_space.min_z;
+            position.z = (mtrandom::gaussian())*defectspace_z+defectspace_min_z;
         }
 	    else{ //uniform
-            position.z = (create::internal::grnd()*1.4-0.2)*defectspace_z+defined_space.min_z;
+            position.z = (create::internal::grnd())*defectspace_z+defectspace_min_z;
         }
 
         //reversed gaussian distribution
         if (reversed.x==true){
-            if (position.x-defined_space.min_x<defectspace_x/2){
+            if (position.x-defectspace_min_x<defectspace_x/2){
                 //if in first half, shift to second half, this splits the gaussian curve into two and shifts its center away from the sample's center to the edges 
                 position.x=position.x+defectspace_x/2;
             }
-            if (position.x-defined_space.min_x>defectspace_x/2){
+            if (position.x-defectspace_min_x>defectspace_x/2){
                 //if in second half, shift to first half 
                 position.x=position.x-defectspace_x/2;
             }
         }
         if (reversed.y==true){
-            if (position.y-defined_space.min_y<defectspace_y/2){
+            if (position.y-defectspace_min_y<defectspace_y/2){
                 //if in first half, shift to second half 
                 position.y=position.y+defectspace_y/2;
             }
-            if (position.y-defined_space.min_y>defectspace_y/2){
+            if (position.y-defectspace_min_y>defectspace_y/2){
                 //if in second half, shift to first half 
                 position.y=position.y-defectspace_y/2;
             }
         }
         if (reversed.z==true){
-            if (position.z-defined_space.min_z<defectspace_z/2){
+            if (position.z-defectspace_min_z<defectspace_z/2){
                 //if in first half, shift to second half 
                 position.z=position.z+defectspace_z/2;
             }
-            if (position.z-defined_space.min_z>defectspace_z/2){
+            if (position.z-defectspace_min_z>defectspace_z/2){
                 //if in second half, shift to first half 
                 position.z=position.z-defectspace_z/2;
             }
@@ -283,16 +268,161 @@ std::vector < seed_point_defects > generate_random_defect_seed_points(int defect
 
 		// save valid positions
 		if(defect_distance == true) defects_positions.push_back(position);
+
+        //distribution check: write defects to file 
+        distributionfile << position.x << " " << position.y << " " << position.z << ".\n";
+        
     }
+    distributionfile << "space " << defectspace_x << " " << defectspace_y << " " << defectspace_z << ".\n";
+    
+    
+
+    distributionfile.close();
 
     return defects_positions;
 
 } //end of defects position function
 
 
-void voronoi_defects(std::vector<cs::catom_t> & catom_array, int defect_amount){
+void voronoi_defects(std::vector<cs::catom_t> & catom_array){
+    //--------------------------------------------------------------------------------------------
+    // part 1: create voronoi structure in chosen area
+    //--------------------------------------------------------------------------------------------
 
+    //make a copy of catom_array with only relevant atoms (identical to catom_array if defectspace=systemsize so for now not included) 
     
+
+    int nc = floor(catom_array.size()/(defect_vacancies+0.5*defect_vacancies)); //number of voronoi cells to be generated in space (currently have on average 50% more atoms in cell than vacancies needed)
+
+    std::vector< seed_point_defects > voronoiseed_positions(0);//vector to store all positions of voronoi seeds
+
+    //loop through cell amount to create random position for each (uniformly distributed)
+    for (int i=0; i<nc; i++){
+
+        // generate random x,y,z trial point 
+		seed_point_defects voronoiseed; 
+        
+        voronoiseed.x = (create::internal::grnd()*cs::system_dimensions[0]); //x-coordinate 
+        voronoiseed.y = (create::internal::grnd()*cs::system_dimensions[1]); //y-coordinate
+        voronoiseed.z = (create::internal::grnd()*cs::system_dimensions[2]); //z-coordinate
+
+        //test positions for being good choices?
+
+        //store positions
+        voronoiseed_positions.push_back(voronoiseed);
+    }
+
+    std::vector< std::vector <int> > voronoigrid(nc-1); //vector storing atoms that correspond to a cell
+    std::vector< std::vector <double> > sortingdistances(nc-1); //temporary vector storing distances of the atom to their seed point of the cell for sorting
+    //loop through atoms inside defectspace to assign to a seed point they're closest to
+    for (int atom=0;atom<catom_array.size();atom++){
+
+        //find correct voronoi cell
+        std::vector< double > seeddistances(0); 
+        for (int i=0;i<nc;i++){
+            //calculate distance of atom from the seed position
+            double distance_from_seed_sq= (catom_array[atom].x-voronoiseed_positions[i].x)*(catom_array[atom].x-voronoiseed_positions[i].x) + 
+                                          (catom_array[atom].y-voronoiseed_positions[i].y)*(catom_array[atom].y-voronoiseed_positions[i].y) + 
+                                          (catom_array[atom].z-voronoiseed_positions[i].z)*(catom_array[atom].z-voronoiseed_positions[i].z);
+            //save all distances temporarily
+            seeddistances.push_back(distance_from_seed_sq);
+        }
+        //find closest seed point
+        int closestseedindex = std::min_element(seeddistances.begin(),seeddistances.end()) - seeddistances.begin();
+        
+        //add to that cell
+        voronoigrid[closestseedindex].push_back(atom);
+        sortingdistances[closestseedindex].push_back(seeddistances[closestseedindex]);
+    }
+
+    //sort voronoigrid vector (bubble sort)
+    for (int cells=0;cells<nc;cells++){
+        for (int j=0;j<sortingdistances[cells].size();j++){
+            for (int i=j+1;i<sortingdistances[cells].size();i++){
+                if(sortingdistances[cells][j] < sortingdistances[cells][i]){
+                    //sort atoms accordingly
+                    int temp = voronoigrid[cells][i];
+                    voronoigrid[cells][i] = voronoigrid[cells][j];
+                    voronoigrid[cells][j] = temp;
+                    //also update distances
+                    int temp_d = sortingdistances[cells][i];
+                    sortingdistances[cells][i] = sortingdistances[cells][j];
+                    sortingdistances[cells][j] = temp_d;
+                }
+            }
+        }
+    }
+    //end of distances vector
+
+    //check grid - comment out or delete
+    std::ofstream voronoigridfile;
+    voronoigridfile.open ("voronoigrid.txt");
+    //head of file: cell, amount of atoms in cell
+    for (int h=0;h<nc;h++){
+        voronoigridfile << h << " " << voronoigrid[h].size() << ".\n";
+    }
+    //rest of file filled with voronoicell, atomindex, atom coordinates xyz
+    for (int h=0;h<nc;h++){
+        for (int k=0;k<voronoigrid[h].size();k++){
+            voronoigridfile << h << " " << voronoigrid[h][k] << " " << catom_array[voronoigrid[h][k]].x << " " << catom_array[voronoigrid[h][k]].y << " " << catom_array[voronoigrid[h][k]].z << ".\n";
+        }
+    }
+    voronoigridfile.close();
+    //end of checks
+
+
+    //--------------------------------------------------------------------------------------------
+    // part 2: create defects from structure
+    //--------------------------------------------------------------------------------------------
+    int loopbreak=0; //variable to break the loop from running if a certain number of failed trial positions has been reached
+    std::vector< int > chosencells(0);//temporary vector for checking
+
+    //open file for distribution testing
+    std::ofstream voronoidistributionfile;
+    voronoidistributionfile.open ("voronoidistribution.txt");
+
+    for (int def=0;def<defect_amount;def++){
+        int defectseed = floor(create::internal::grnd()*nc);
+        zlog << zTs() << "defectseed " << defectseed << std::endl;
+        
+        //check that this voronoi cell has not been chosen as a defect before
+        bool newcell=true;
+        for (int i=0;i<chosencells.size();i++){
+            if (chosencells[i]==defectseed || voronoigrid[defectseed].size()<defect_vacancies){
+                newcell=false;
+                break;
+            }
+        } //check complete
+
+        if (newcell){ //delete a portion of/all atoms in this voronoi cell
+            chosencells.push_back(defectseed);
+            for(int vac=0;vac<defect_vacancies;vac++){ 
+                if (vac<voronoigrid[defectseed].size()){
+                    catom_array[voronoigrid[defectseed][vac]].include=false; //delete atom from catom array
+
+                    //distribution check: write defects to file 
+                    voronoidistributionfile << def << " " << vac << " " << catom_array[voronoigrid[defectseed][vac]].x << " " << catom_array[voronoigrid[defectseed][vac]].y << " " << catom_array[voronoigrid[defectseed][vac]].z << ".\n";
+                } 
+                else { 
+                    zlog << zTs() << "Maximum amount of atoms in voronoi cell was reached at " << vac << " for defect " << def << std::endl;
+                    break; //continue with next defect -alternative to be coded: take defects from neighbouring cells
+                } 
+            }
+            loopbreak=0; //reset loopbreak
+        }
+        else { //cell chosen was not valid
+            def=def-1;
+            loopbreak=loopbreak+1;
+            if (loopbreak>1000000){
+                // Print informative message to log book
+                zlog << zTs() << "Maximum amount of trial positions was reached for defect " << def+1 << " and simulation was ended" << std::endl;
+                err::vexit(); //end simulation
+            }
+        }
+    }
+
+    voronoidistributionfile.close();
+
 
 } //end of voronoi function
 

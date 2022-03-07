@@ -127,10 +127,18 @@ namespace create{
       extern bool grain_poission;
 
       extern bool select_material_by_z_height;
-
+      
+      //for defect creation
       extern bool defect_bool;
       extern int defect_amount;
+      extern int defect_vacancies;
       extern double min_defect_distance;
+      extern double defectspace_min_x;
+      extern double defectspace_max_x;
+      extern double defectspace_min_y;
+      extern double defectspace_max_y;
+      extern double defectspace_min_z;
+      extern double defectspace_max_z;
 
       //-----------------------------------------------------------------------------
       // Internal functions for create module

@@ -1,0 +1,19 @@
+#---------------------------------------------------
+# Number of Materials
+#---------------------------------------------------
+material:num-materials=3
+#---------------------------------------------------
+# Material 1 
+#---------------------------------------------------
+material[1]:material-name=Cr
+material[1]:damping-constant=1.0
+material[1]:atomic-spin-moment=3.35500000000000000000 !muB
+material[1]:material-element=Cr
+#material[1]:exchange-matrix[1]=1.0e-22
+#material[1]:biquadratic-exchange[1]= 1.0e-22
+material[1]:uniaxial-anisotropy-direction=0,0,1
+material[1]:uniaxial-anisotropy-constant=1.081469181375e-23
+material[1]:minimum-height=0.0
+material[1]:maximum-height=1.0
+material[1]:initial-spin-direction=random
+material[1]:core-shell-size= 0.0
