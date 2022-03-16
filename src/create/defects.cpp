@@ -291,8 +291,16 @@ void voronoi_defects(std::vector<cs::catom_t> & catom_array){
 
     //make a copy of catom_array with only relevant atoms (identical to catom_array if defectspace=systemsize so for now not included) 
     
+    uint64_t num_local_atoms = catom_array.size();
+    uint64_t num_total_atoms = 0; // number of atoms across all processors
 
-    int nc = floor(catom_array.size()/(defect_vacancies+0.5*defect_vacancies)); //number of voronoi cells to be generated in space (currently have on average 50% more atoms in cell than vacancies needed)
+      #ifdef MPICF
+         // calculate number of atoms to be output on all processors
+         MPI_Allreduce(&num_local_atoms, &num_total_atoms, 1, MPI_UINT64_T, MPI_SUM, MPI_COMM_WORLD);
+      #else
+         num_total_atoms = num_local_atoms;
+      #endif
+    int nc = floor(num_total_atoms/(defect_vacancies+0.5*defect_vacancies)); //number of voronoi cells to be generated in space (currently have on average 50% more atoms in cell than vacancies needed)
 
     std::vector< seed_point_defects > voronoiseed_positions(0);//vector to store all positions of voronoi seeds
 
@@ -355,7 +363,8 @@ void voronoi_defects(std::vector<cs::catom_t> & catom_array){
     //end of distances vector
 
     //check grid - comment out or delete
-    std::ofstream voronoigridfile;
+    if (vmpi::my_rank==0){
+        std::ofstream voronoigridfile;
     voronoigridfile.open ("voronoigrid.txt");
     //head of file: cell, amount of atoms in cell
     for (int h=0;h<nc;h++){
@@ -369,6 +378,7 @@ void voronoi_defects(std::vector<cs::catom_t> & catom_array){
     }
     voronoigridfile.close();
     //end of checks
+    }
 
 
     //--------------------------------------------------------------------------------------------
@@ -383,6 +393,7 @@ void voronoi_defects(std::vector<cs::catom_t> & catom_array){
 
     for (int def=0;def<defect_amount;def++){
         int defectseed = floor(create::internal::grnd()*nc);
+        //mpi_broadcast defectseed;
         zlog << zTs() << "defectseed " << defectseed << std::endl;
         
         //check that this voronoi cell has not been chosen as a defect before
@@ -399,6 +410,16 @@ void voronoi_defects(std::vector<cs::catom_t> & catom_array){
             for(int vac=0;vac<defect_vacancies;vac++){ 
                 if (vac<voronoigrid[defectseed].size()){
                     catom_array[voronoigrid[defectseed][vac]].include=false; //delete atom from catom array
+                    //work out how many atoms are being deleted on each processor 
+                    //you can bring all atom positions and radii from center, source processor number + radius
+                    // mpi gather 
+                    //std::vector <int> local_proc(sortingdistances.size() of current defect,vmpi::my_rank);
+                    //1. reduction: how many atoms in this grain =num_atoms_grain
+                    //std::vector <int> processor_of_atom(num_atoms_grain);
+                    //vmpi::collate(local_proc, processor_of_atom)
+                    //print: should be list of total atoms in defect and where each one is
+                    //collate on radii(local_radii, global_radii)
+                    //sort by radius, iterate until vacancies are reached 
 
                     //distribution check: write defects to file 
                     voronoidistributionfile << def << " " << vac << " " << catom_array[voronoigrid[defectseed][vac]].x << " " << catom_array[voronoigrid[defectseed][vac]].y << " " << catom_array[voronoigrid[defectseed][vac]].z << ".\n";
